@@ -1,0 +1,5 @@
+age
+CREA(¦Ìmol/L)
+HR
+hospitalization £¨d£©
+HGB (g/L)
