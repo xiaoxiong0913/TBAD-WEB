@@ -24,7 +24,7 @@ feature_ranges = {
     "age": (20, 100),  # 年龄范围
     "CREA(μmol/L)": (30.0, 300.0),  # 肌酐范围
     "HR": (30, 180),  # 心率范围
-    "hospitalization （d）": (1, 100),  # 住院天数
+    "hospitalization （d）": (1, 100),  # 注意使用中文括号
     "HGB (g/L)": (50.0, 180.0)  # 血红蛋白范围
 }
 
@@ -50,7 +50,12 @@ with st.form("prediction_form"):
     age = st.slider('Age (years)', min_value=feature_ranges["age"][0], max_value=feature_ranges["age"][1], value=50)
     crea = st.slider('CREA (μmol/L)', min_value=feature_ranges["CREA(μmol/L)"][0], max_value=feature_ranges["CREA(μmol/L)"][1], value=100.0)
     hr = st.slider('Heart Rate (HR, bpm)', min_value=feature_ranges["HR"][0], max_value=feature_ranges["HR"][1], value=70)
-    hospitalization_days = st.slider('Hospitalization Days', min_value=feature_ranges["hospitalization (d)"][0], max_value=feature_ranges["hospitalization (d)"][1], value=10)
+    hospitalization_days = st.slider(
+        'Hospitalization Days',
+        min_value=feature_ranges["hospitalization （d）"][0],  # 确保使用中文括号
+        max_value=feature_ranges["hospitalization （d）"][1],  # 确保使用中文括号
+        value=10
+    )
     hgb = st.slider('Hemoglobin (HGB, g/L)', min_value=feature_ranges["HGB (g/L)"][0], max_value=feature_ranges["HGB (g/L)"][1], value=120.0)
 
     # 提交按钮
@@ -59,14 +64,13 @@ with st.form("prediction_form"):
 # 风险预测阈值
 risk_threshold = 0.23910744828243835  # 这是模型判定高风险的阈值
 
-# 当用户提交表单时
 if submit_button:
     # 收集输入数据
     data = {
         "age": age,
         "CREA(μmol/L)": crea,
         "HR": hr,
-        "hospitalization （d）": hospitalization_days,
+        "hospitalization （d）": hospitalization_days,  # 确保特征名称一致
         "HGB (g/L)": hgb
     }
 
