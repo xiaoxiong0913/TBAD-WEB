@@ -55,7 +55,8 @@ with col1:
 
 with col2:
     # 右侧：调整标题大小
-    st.markdown("<h4 style='margin-bottom:10px;'>3-Year Mortality Prediction for B-Type Aortic Dissection</h4>", unsafe_allow_html=True)
+    st.markdown("<h3 style='margin-bottom:10px;'>3-Year Mortality Prediction for B-Type Aortic Dissection</h3>", unsafe_allow_html=True)
+    st.markdown("<h4 style='margin-bottom:10px;'>Introduction</h4>", unsafe_allow_html=True)
     st.markdown("<p style='font-size:14px;'>This web-based calculator was developed based on an SVM model with an AUC of 0.82 for predicting 3-year mortality in B-type aortic dissection patients.</p>", unsafe_allow_html=True)
 
     # 预测结果
