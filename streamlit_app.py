@@ -34,15 +34,15 @@ normal_ranges = {
     "HGB (g/L)": (120.0, 160.0)  # 血红蛋白正常值
 }
 
-# 创建页面布局：左侧为 Selection Panel，右侧为结果显示
-col1, col2 = st.columns([1, 2])  # 左侧占1份宽度，右侧占2份宽度
+# 页面布局：两列
+col1, col2 = st.columns([1, 2])  # 左列1份宽度，右列2份宽度
 
 with col1:
-    # 左侧：Selection Panel
-    st.markdown("<h3>Selection Panel</h3>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:16px;'>Picking up parameters</p>", unsafe_allow_html=True)
+    # 左侧：选择面板
+    st.markdown("<h4 style='margin-bottom:10px;'>Selection Panel</h4>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:14px;'>Picking up parameters</p>", unsafe_allow_html=True)
 
-    # 使用 Streamlit 表单
+    # 使用表单
     with st.form("selection_form"):
         age = st.selectbox('Age (years)', options=feature_ranges["age"], index=30)
         crea = st.selectbox('CREA (μmol/L)', options=feature_ranges["CREA(μmol/L)"], index=70)
@@ -54,14 +54,11 @@ with col1:
         submit_button = st.form_submit_button("Predict")
 
 with col2:
-    # 右侧：结果显示和个性化建议
-    st.title('3-Year Mortality Prediction for B-Type Aortic Dissection')
+    # 右侧：调整标题大小
+    st.markdown("<h4 style='margin-bottom:10px;'>3-Year Mortality Prediction for B-Type Aortic Dissection</h4>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:14px;'>This web-based calculator was developed based on an SVM model with an AUC of 0.82 for predicting 3-year mortality in B-type aortic dissection patients.</p>", unsafe_allow_html=True)
 
-    st.markdown("""
-    ## Introduction
-    This web-based calculator was developed based on an SVM model with an AUC of 0.82 for predicting 3-year mortality in B-type aortic dissection patients.
-    """)
-
+    # 预测结果
     if submit_button:
         # 收集输入数据
         data = {
@@ -73,30 +70,30 @@ with col2:
         }
 
         try:
-            # 将数据转换为 DataFrame
+            # 转换为 DataFrame
             data_df = pd.DataFrame([data], columns=feature_ranges.keys())
 
             # 数据标准化
             data_scaled = scaler.transform(data_df)
 
-            # 进行预测
+            # 预测
             prediction = model.predict_proba(data_scaled)[:, 1][0]
 
-            # 显示结果，低风险为绿色，高风险为红色
+            # 显示预测结果，添加颜色区分
             if prediction >= 0.23910744828243835:  # 高风险
                 st.markdown(
-                    f"<span style='color:red; font-size:18px;'>Predicted Mortality Risk: **{prediction * 100:.2f}%** (High risk)</span>",
+                    f"<span style='color:red; font-size:16px;'>Predicted Mortality Risk: **{prediction * 100:.2f}%** (High risk)</span>",
                     unsafe_allow_html=True)
                 st.markdown(
-                    "<span style='color:red; font-size:18px;'>High risk of mortality within 3 years.</span>",
+                    "<span style='color:red; font-size:16px;'>High risk of mortality within 3 years.</span>",
                     unsafe_allow_html=True)
                 st.write("**Recommendations:**")
             else:  # 低风险
                 st.markdown(
-                    f"<span style='color:green; font-size:18px;'>Predicted Mortality Risk: **{prediction * 100:.2f}%** (Low risk)</span>",
+                    f"<span style='color:green; font-size:16px;'>Predicted Mortality Risk: **{prediction * 100:.2f}%** (Low risk)</span>",
                     unsafe_allow_html=True)
                 st.markdown(
-                    "<span style='color:green; font-size:18px;'>Low risk of mortality within 3 years.</span>",
+                    "<span style='color:green; font-size:16px;'>Low risk of mortality within 3 years.</span>",
                     unsafe_allow_html=True)
 
             # 个性化建议
