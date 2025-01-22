@@ -34,16 +34,12 @@ normal_ranges = {
     "HGB (g/L)": (120.0, 160.0)  # 血红蛋白正常值
 }
 
-# 创建页面布局：左侧为标题，右侧为仪表盘
+# 创建页面布局：左侧为仪表盘，右侧为结果显示
 col1, col2 = st.columns([1, 2])  # 左侧占1份宽度，右侧占2份宽度
 
 with col1:
-    # 左侧：标题
-    st.title('3-Year Mortality Prediction for B-Type Aortic Dissection')
-
-with col2:
-    # 右侧：预测仪表盘
-    st.markdown("### Input Panel")
+    # 左侧：仪表盘
+    st.title('Input Panel')
 
     with st.form("prediction_form"):
         age = st.slider('Age (years)', min_value=feature_ranges["age"][0], max_value=feature_ranges["age"][1], value=50)
@@ -60,8 +56,15 @@ with col2:
         # 提交按钮
         submit_button = st.form_submit_button("Predict")
 
-    # 风险预测阈值
-    risk_threshold = 0.23910744828243835  # 模型判定高风险的阈值
+with col2:
+    # 右侧：结果显示和个性化建议
+    st.title('3-Year Mortality Prediction for B-Type Aortic Dissection')
+
+    st.markdown("""
+    This tool uses an SVM model to predict 3-year mortality in B-Type aortic dissection patients. It leverages clinical and biochemical parameters to stratify risk, providing a reliable tool to aid in patient management.
+
+    **Disclaimer:** This tool is for educational purposes only. Always consult a healthcare provider for medical advice.
+    """)
 
     if submit_button:
         # 收集输入数据
@@ -86,7 +89,7 @@ with col2:
             # 显示结果
             st.markdown(f"### Predicted Mortality Risk: **{prediction * 100:.2f}%**")
 
-            if prediction >= risk_threshold:
+            if prediction >= 0.23910744828243835:
                 # 高风险提示
                 st.markdown(
                     "<span style='color:red; font-size:18px;'>High risk of mortality within 3 years.</span>",
@@ -99,15 +102,15 @@ with col2:
                         normal_min, normal_max = normal_ranges[feature]
                         if value < normal_min:
                             st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is below the normal range ({normal_min} - {normal_max}). Consider increasing it through appropriate measures (e.g., diet, medication).</span>",
+                                f"<span style='color:red;'>{feature}: Your value is {value}. It is below the normal range ({normal_min} - {normal_max}). Consider increasing it.</span>",
                                 unsafe_allow_html=True)
                         elif value > normal_max:
                             st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is above the normal range ({normal_min} - {normal_max}). Consider decreasing it through lifestyle adjustments or medications.</span>",
+                                f"<span style='color:red;'>{feature}: Your value is {value}. It is above the normal range ({normal_min} - {normal_max}). Consider decreasing it.</span>",
                                 unsafe_allow_html=True)
                         else:
                             st.markdown(
-                                f"<span style='color:green;'>{feature}: Your value is within the normal range ({normal_min} - {normal_max}). Maintain this level for optimal health.</span>",
+                                f"<span style='color:green;'>{feature}: Your value is within the normal range ({normal_min} - {normal_max}). Maintain this level.</span>",
                                 unsafe_allow_html=True)
                 st.write("**Further Recommendations:**")
                 st.markdown(
