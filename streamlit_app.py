@@ -24,7 +24,7 @@ feature_ranges = {
     "age": (20, 100),  # 年龄范围
     "CREA(μmol/L)": (30.0, 300.0),  # 肌酐范围
     "HR": (30, 180),  # 心率范围
-    "hospitalization (d)": (1, 100),  # 住院天数
+    "hospitalization （d）": (1, 100),  # 住院天数
     "HGB (g/L)": (50.0, 180.0)  # 血红蛋白范围
 }
 
@@ -66,7 +66,7 @@ if submit_button:
         "age": age,
         "CREA(μmol/L)": crea,
         "HR": hr,
-        "hospitalization (d)": hospitalization_days,
+        "hospitalization （d）": hospitalization_days,
         "HGB (g/L)": hgb
     }
 
