@@ -34,24 +34,40 @@ normal_ranges = {
     "HGB (g/L)": (120.0, 160.0)  # 血红蛋白正常值
 }
 
-# 创建页面布局：左侧为仪表盘，右侧为结果显示
+# 创建页面布局：左侧为 Selection Panel，右侧为结果显示
 col1, col2 = st.columns([1, 2])  # 左侧占1份宽度，右侧占2份宽度
 
 with col1:
-    # 左侧：仪表盘
-    st.title('Input Panel')
+    # 左侧：Selection Panel
+    st.title('Selection Panel')
+    st.markdown("### Picking up parameters")
 
-    with st.form("prediction_form"):
-        age = st.slider('Age (years)', min_value=feature_ranges["age"][0], max_value=feature_ranges["age"][1], value=50)
-        crea = st.slider('CREA (μmol/L)', min_value=feature_ranges["CREA(μmol/L)"][0], max_value=feature_ranges["CREA(μmol/L)"][1], value=100.0)
-        hr = st.slider('Heart Rate (HR, bpm)', min_value=feature_ranges["HR"][0], max_value=feature_ranges["HR"][1], value=70)
-        hospitalization_days = st.slider(
-            'Hospitalization Days',
-            min_value=feature_ranges["hospitalization （d）"][0],
-            max_value=feature_ranges["hospitalization （d）"][1],
-            value=10
+    with st.form("selection_form"):
+        age = st.selectbox(
+            'Age (years)',
+            options=list(range(feature_ranges["age"][0], feature_ranges["age"][1] + 1, 5)),
+            index=6
         )
-        hgb = st.slider('Hemoglobin (HGB, g/L)', min_value=feature_ranges["HGB (g/L)"][0], max_value=feature_ranges["HGB (g/L)"][1], value=120.0)
+        crea = st.selectbox(
+            'CREA (μmol/L)',
+            options=list(range(int(feature_ranges["CREA(μmol/L)"][0]), int(feature_ranges["CREA(μmol/L)"][1]) + 10, 10)),
+            index=7
+        )
+        hr = st.selectbox(
+            'Heart Rate (HR, bpm)',
+            options=list(range(feature_ranges["HR"][0], feature_ranges["HR"][1] + 10, 10)),
+            index=4
+        )
+        hospitalization_days = st.selectbox(
+            'Hospitalization Days',
+            options=list(range(feature_ranges["hospitalization （d）"][0], feature_ranges["hospitalization （d）"][1] + 5, 5)),
+            index=2
+        )
+        hgb = st.selectbox(
+            'Hemoglobin (HGB, g/L)',
+            options=list(range(int(feature_ranges["HGB (g/L)"][0]), int(feature_ranges["HGB (g/L)"][1]) + 10, 10)),
+            index=7
+        )
 
         # 提交按钮
         submit_button = st.form_submit_button("Predict")
