@@ -8,8 +8,8 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 # 加载模型和标准化器
-model_path = r"E:\中心实验室\XWY\B型主动脉夹层\mimic数据4模型验证最终结果\WEB\svm_model.pkl"
-scaler_path = r"E:\中心实验室\XWY\B型主动脉夹层\mimic数据4模型验证最终结果\WEB\scaler.pkl"
+model_path = r"svm_model.pkl"
+scaler_path = r"scaler.pkl"
 
 try:
     with open(model_path, 'rb') as model_file, open(scaler_path, 'rb') as scaler_file:
