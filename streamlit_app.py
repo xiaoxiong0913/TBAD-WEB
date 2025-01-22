@@ -21,11 +21,11 @@ except FileNotFoundError as e:
 
 # 特征名称和范围
 feature_ranges = {
-    "age": (20, 100),  # 年龄范围
-    "CREA(μmol/L)": (30.0, 300.0),  # 肌酐范围
-    "HR": (30, 180),  # 心率范围
-    "hospitalization （d）": (1, 100),  # 住院天数
-    "HGB (g/L)": (50.0, 180.0)  # 血红蛋白范围
+    "age": list(range(20, 101)),  # 年龄范围
+    "CREA(μmol/L)": [round(x, 1) for x in range(30, 301)],  # 肌酐范围
+    "HR": list(range(30, 181)),  # 心率范围
+    "hospitalization （d）": list(range(1, 101)),  # 住院天数
+    "HGB (g/L)": [round(x, 1) for x in range(50, 181)]  # 血红蛋白范围
 }
 
 normal_ranges = {
@@ -43,31 +43,11 @@ with col1:
     st.markdown("### Picking up parameters")
 
     with st.form("selection_form"):
-        age = st.selectbox(
-            'Age (years)',
-            options=list(range(feature_ranges["age"][0], feature_ranges["age"][1] + 1, 5)),
-            index=6
-        )
-        crea = st.selectbox(
-            'CREA (μmol/L)',
-            options=list(range(int(feature_ranges["CREA(μmol/L)"][0]), int(feature_ranges["CREA(μmol/L)"][1]) + 10, 10)),
-            index=7
-        )
-        hr = st.selectbox(
-            'Heart Rate (HR, bpm)',
-            options=list(range(feature_ranges["HR"][0], feature_ranges["HR"][1] + 10, 10)),
-            index=4
-        )
-        hospitalization_days = st.selectbox(
-            'Hospitalization Days',
-            options=list(range(feature_ranges["hospitalization （d）"][0], feature_ranges["hospitalization （d）"][1] + 5, 5)),
-            index=2
-        )
-        hgb = st.selectbox(
-            'Hemoglobin (HGB, g/L)',
-            options=list(range(int(feature_ranges["HGB (g/L)"][0]), int(feature_ranges["HGB (g/L)"][1]) + 10, 10)),
-            index=7
-        )
+        age = st.selectbox('Age (years)', options=feature_ranges["age"], index=30)
+        crea = st.selectbox('CREA (μmol/L)', options=feature_ranges["CREA(μmol/L)"], index=70)
+        hr = st.selectbox('Heart Rate (HR, bpm)', options=feature_ranges["HR"], index=40)
+        hospitalization_days = st.selectbox('Hospitalization Days', options=feature_ranges["hospitalization （d）"], index=9)
+        hgb = st.selectbox('Hemoglobin (HGB, g/L)', options=feature_ranges["HGB (g/L)"], index=70)
 
         # 提交按钮
         submit_button = st.form_submit_button("Predict")
@@ -77,9 +57,8 @@ with col2:
     st.title('3-Year Mortality Prediction for B-Type Aortic Dissection')
 
     st.markdown("""
-    This tool uses an SVM model to predict 3-year mortality in B-Type aortic dissection patients. It leverages clinical and biochemical parameters to stratify risk, providing a reliable tool to aid in patient management.
-
-    **Disclaimer:** This tool is for educational purposes only. Always consult a healthcare provider for medical advice.
+    ## Introduction
+    This web-based calculator was developed based on an SVM model with an AUC of 0.82 for predicting 3-year mortality in B-type aortic dissection patients.
     """)
 
     if submit_button:
