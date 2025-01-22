@@ -81,60 +81,45 @@ with col2:
             # 进行预测
             prediction = model.predict_proba(data_scaled)[:, 1][0]
 
-            # 显示结果
-            st.markdown(f"### Predicted Mortality Risk: **{prediction * 100:.2f}%**")
-
-            if prediction >= 0.23910744828243835:
-                # 高风险提示
+            # 显示结果，低风险为绿色，高风险为红色
+            if prediction >= 0.23910744828243835:  # 高风险
+                st.markdown(
+                    f"<span style='color:red; font-size:18px;'>Predicted Mortality Risk: **{prediction * 100:.2f}%** (High risk)</span>",
+                    unsafe_allow_html=True)
                 st.markdown(
                     "<span style='color:red; font-size:18px;'>High risk of mortality within 3 years.</span>",
                     unsafe_allow_html=True)
                 st.write("**Recommendations:**")
+            else:  # 低风险
+                st.markdown(
+                    f"<span style='color:green; font-size:18px;'>Predicted Mortality Risk: **{prediction * 100:.2f}%** (Low risk)</span>",
+                    unsafe_allow_html=True)
+                st.markdown(
+                    "<span style='color:green; font-size:18px;'>Low risk of mortality within 3 years.</span>",
+                    unsafe_allow_html=True)
 
-                # 提供个性化建议
-                for feature, value in data.items():
-                    if feature in normal_ranges:
-                        normal_min, normal_max = normal_ranges[feature]
-                        if value < normal_min:
-                            st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is below the normal range. Consider increasing it.</span>",
-                                unsafe_allow_html=True)
-                        elif value > normal_max:
-                            st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is above the normal range. Consider decreasing it.</span>",
-                                unsafe_allow_html=True)
-                        else:
-                            st.markdown(
-                                f"<span style='color:green;'>{feature}: Normal.</span>",
-                                unsafe_allow_html=True)
+            # 个性化建议
+            for feature, value in data.items():
+                if feature in normal_ranges:
+                    normal_min, normal_max = normal_ranges[feature]
+                    if value < normal_min:
+                        st.markdown(
+                            f"<span style='color:red;'>{feature}: Your value is {value}. It is below the normal range. Consider increasing it.</span>",
+                            unsafe_allow_html=True)
+                    elif value > normal_max:
+                        st.markdown(
+                            f"<span style='color:red;'>{feature}: Your value is {value}. It is above the normal range. Consider decreasing it.</span>",
+                            unsafe_allow_html=True)
+                    else:
+                        st.markdown(
+                            f"<span style='color:green;'>{feature}: Normal.</span>",
+                            unsafe_allow_html=True)
+            if prediction >= 0.23910744828243835:
                 st.write("**Further Recommendations:**")
                 st.markdown(
                     "- Regular follow-up with your healthcare provider.\n"
                     "- Consider additional imaging studies or lab tests as needed.\n"
                     "- Optimize treatment through medication or surgical intervention."
                 )
-            else:
-                # 低风险提示
-                st.markdown(
-                    "<span style='color:green; font-size:18px;'>Low risk of mortality within 3 years.</span>",
-                    unsafe_allow_html=True)
-                st.write("Your parameters are within acceptable ranges. Continue to monitor and maintain a healthy lifestyle.")
-
-                # 显示特征状态
-                for feature, value in data.items():
-                    if feature in normal_ranges:
-                        normal_min, normal_max = normal_ranges[feature]
-                        if value < normal_min:
-                            st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is slightly below the normal range. Monitor and consult your doctor if necessary.</span>",
-                                unsafe_allow_html=True)
-                        elif value > normal_max:
-                            st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is slightly above the normal range. Ensure follow-up to prevent complications.</span>",
-                                unsafe_allow_html=True)
-                        else:
-                            st.markdown(
-                                f"<span style='color:green;'>{feature}: Normal.</span>",
-                                unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error during prediction: {e}")
