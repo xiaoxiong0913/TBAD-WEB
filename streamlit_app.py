@@ -34,30 +34,16 @@ normal_ranges = {
     "HGB (g/L)": (120.0, 160.0)  # 血红蛋白正常值
 }
 
-# 创建页面布局：左侧为介绍，右侧为仪表盘
+# 创建页面布局：左侧为标题，右侧为仪表盘
 col1, col2 = st.columns([1, 2])  # 左侧占1份宽度，右侧占2份宽度
 
 with col1:
-    # 左侧：工具介绍
-    st.title('3-Year Mortality Prediction for B-Type Aortic Dissection Patients')
-
-    st.markdown("""
-    ## Introduction
-    This web-based calculator was developed based on an SVM model with an AUC of 0.82 (95% CI: 0.78 to 0.86) for predicting 3-year mortality in B-type aortic dissection patients. 
-    The SVM model provides robust predictions by utilizing clinical and biochemical parameters, enabling clinicians to stratify risk and guide personalized treatment plans.
-
-    **How to use this tool:**
-    - Enter the patient details in the input panel on the right.
-    - The model will provide a predicted 3-year mortality risk as a percentage.
-    - High-risk predictions will be accompanied by personalized recommendations to optimize patient care.
-
-    **Disclaimer:** 
-    This tool is designed for educational purposes and is not a substitute for professional medical advice. Always consult a qualified healthcare provider for patient care.
-    """)
+    # 左侧：标题
+    st.title('3-Year Mortality Prediction for B-Type Aortic Dissection')
 
 with col2:
     # 右侧：预测仪表盘
-    st.markdown("## Prediction Panel")
+    st.markdown("### Input Panel")
 
     with st.form("prediction_form"):
         age = st.slider('Age (years)', min_value=feature_ranges["age"][0], max_value=feature_ranges["age"][1], value=50)
@@ -125,9 +111,9 @@ with col2:
                                 unsafe_allow_html=True)
                 st.write("**Further Recommendations:**")
                 st.markdown(
-                    "- Ensure regular follow-up with your healthcare provider.\n"
-                    "- Consider advanced imaging studies or lab tests for further evaluation.\n"
-                    "- Optimize treatment with medications or surgical interventions as needed."
+                    "- Regular follow-up with your healthcare provider.\n"
+                    "- Consider additional imaging studies or lab tests as needed.\n"
+                    "- Optimize treatment through medication or surgical intervention."
                 )
             else:
                 # 低风险提示
@@ -142,11 +128,11 @@ with col2:
                         normal_min, normal_max = normal_ranges[feature]
                         if value < normal_min:
                             st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is slightly below the normal range ({normal_min} - {normal_max}). Consider monitoring and consulting your doctor if needed.</span>",
+                                f"<span style='color:red;'>{feature}: Your value is {value}. It is slightly below the normal range ({normal_min} - {normal_max}). Monitor and consult your doctor if necessary.</span>",
                                 unsafe_allow_html=True)
                         elif value > normal_max:
                             st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is slightly above the normal range ({normal_min} - {normal_max}). Ensure follow-up to avoid complications.</span>",
+                                f"<span style='color:red;'>{feature}: Your value is {value}. It is slightly above the normal range ({normal_min} - {normal_max}). Ensure follow-up to prevent complications.</span>",
                                 unsafe_allow_html=True)
                         else:
                             st.markdown(
