@@ -39,9 +39,10 @@ col1, col2 = st.columns([1, 2])  # 左侧占1份宽度，右侧占2份宽度
 
 with col1:
     # 左侧：Selection Panel
-    st.title('Selection Panel')
-    st.markdown("### Picking up parameters")
+    st.markdown("<h3>Selection Panel</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:16px;'>Picking up parameters</p>", unsafe_allow_html=True)
 
+    # 使用 Streamlit 表单
     with st.form("selection_form"):
         age = st.selectbox('Age (years)', options=feature_ranges["age"], index=30)
         crea = st.selectbox('CREA (μmol/L)', options=feature_ranges["CREA(μmol/L)"], index=70)
