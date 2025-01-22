@@ -97,15 +97,15 @@ with col2:
                         normal_min, normal_max = normal_ranges[feature]
                         if value < normal_min:
                             st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is below the normal range ({normal_min} - {normal_max}). Consider increasing it.</span>",
+                                f"<span style='color:red;'>{feature}: Your value is {value}. It is below the normal range. Consider increasing it.</span>",
                                 unsafe_allow_html=True)
                         elif value > normal_max:
                             st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is above the normal range ({normal_min} - {normal_max}). Consider decreasing it.</span>",
+                                f"<span style='color:red;'>{feature}: Your value is {value}. It is above the normal range. Consider decreasing it.</span>",
                                 unsafe_allow_html=True)
                         else:
                             st.markdown(
-                                f"<span style='color:green;'>{feature}: Your value is within the normal range ({normal_min} - {normal_max}). Maintain this level.</span>",
+                                f"<span style='color:green;'>{feature}: Normal.</span>",
                                 unsafe_allow_html=True)
                 st.write("**Further Recommendations:**")
                 st.markdown(
@@ -126,15 +126,15 @@ with col2:
                         normal_min, normal_max = normal_ranges[feature]
                         if value < normal_min:
                             st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is slightly below the normal range ({normal_min} - {normal_max}). Monitor and consult your doctor if necessary.</span>",
+                                f"<span style='color:red;'>{feature}: Your value is {value}. It is slightly below the normal range. Monitor and consult your doctor if necessary.</span>",
                                 unsafe_allow_html=True)
                         elif value > normal_max:
                             st.markdown(
-                                f"<span style='color:red;'>{feature}: Your value is {value}. It is slightly above the normal range ({normal_min} - {normal_max}). Ensure follow-up to prevent complications.</span>",
+                                f"<span style='color:red;'>{feature}: Your value is {value}. It is slightly above the normal range. Ensure follow-up to prevent complications.</span>",
                                 unsafe_allow_html=True)
                         else:
                             st.markdown(
-                                f"<span style='color:green;'>{feature}: Your value is within the normal range ({normal_min} - {normal_max}). No immediate action is needed.</span>",
+                                f"<span style='color:green;'>{feature}: Normal.</span>",
                                 unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error during prediction: {e}")
