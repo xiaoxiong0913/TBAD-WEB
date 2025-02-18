@@ -29,9 +29,9 @@ feature_ranges = {
 }
 
 normal_ranges = {
-    "CREA(μmol/L)": (60.0, 110.0),  # 肌酐正常值
+    "CREA(mg/dL)": (60.0, 110.0),  # 肌酐正常值
     "HR": (60, 100),  # 心率正常值
-    "HGB (g/L)": (120.0, 160.0)  # 血红蛋白正常值
+    "HGB (g/dL)": (120.0, 160.0)  # 血红蛋白正常值
 }
 
 # 页面布局：两列
@@ -45,10 +45,10 @@ with col1:
     # 使用表单
     with st.form("selection_form"):
         age = st.selectbox('Age (years)', options=feature_ranges["age"], index=30)
-        crea = st.selectbox('CREA (μmol/L)', options=feature_ranges["CREA(μmol/L)"], index=70)
+        crea = st.selectbox('CREA (mg/dL)', options=feature_ranges["CREA(μmol/L)"], index=70)
         hr = st.selectbox('Heart Rate (HR, bpm)', options=feature_ranges["HR"], index=40)
         hospitalization_days = st.selectbox('Hospitalization Days', options=feature_ranges["hospitalization （d）"], index=9)
-        hgb = st.selectbox('Hemoglobin (HGB, g/L)', options=feature_ranges["HGB (g/L)"], index=70)
+        hgb = st.selectbox('Hemoglobin (HGB, g/dL)', options=feature_ranges["HGB (g/L)"], index=70)
 
         # 提交按钮
         submit_button = st.form_submit_button("Predict")
