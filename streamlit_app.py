@@ -45,10 +45,10 @@ with col1:
     # 使用表单
     with st.form("selection_form"):
         age = st.selectbox('Age (years)', options=feature_ranges["age"], index=30)
-        crea = st.selectbox('CREA (mg/dL)', options=feature_ranges["CREA(μmol/L)"], index=70)
+        crea = st.selectbox('CREA (μmol/L)', options=feature_ranges["CREA(μmol/L)"], index=70)
         hr = st.selectbox('Heart Rate (HR, bpm)', options=feature_ranges["HR"], index=40)
         hospitalization_days = st.selectbox('Hospitalization Days', options=feature_ranges["hospitalization （d）"], index=9)
-        hgb = st.selectbox('Hemoglobin (HGB, g/dL)', options=feature_ranges["HGB (g/L)"], index=70)
+        hgb = st.selectbox('Hemoglobin (HGB, g/L)', options=feature_ranges["HGB (g/L)"], index=70)
 
         # 提交按钮
         submit_button = st.form_submit_button("Predict")
