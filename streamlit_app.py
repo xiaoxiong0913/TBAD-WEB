@@ -81,7 +81,7 @@ with col2:
             prediction = model.predict_proba(data_scaled)[:, 1][0]
 
             # 显示预测结果，添加颜色区分
-            if prediction >= 0.23910744828243835:  # 高风险
+            if prediction >= 0.284:  # 高风险
                 st.markdown(
                     f"<span style='color:red; font-size:16px;'>Predicted Mortality Risk: **{prediction * 100:.2f}%** (High risk)</span>",
                     unsafe_allow_html=True)
@@ -113,7 +113,7 @@ with col2:
                         st.markdown(
                             f"<span style='color:green;'>{feature}: Normal.</span>",
                             unsafe_allow_html=True)
-            if prediction >= 0.23910744828243835:
+            if prediction >= 0.284:
                 st.write("**Further Recommendations:**")
                 st.markdown(
                     "- Regular follow-up with your healthcare provider.\n"
