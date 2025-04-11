@@ -1,124 +1,207 @@
 import streamlit as st
 import pandas as pd
 import pickle
-from sklearn.preprocessing import StandardScaler
 import warnings
+from sklearn.preprocessing import StandardScaler
 
-# 忽略 sklearn 的版本警告
+# 处理版本警告
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 # 加载模型和标准化器
-model_path = r"svm_model.pkl"
-scaler_path = r"scaler.pkl"
+model_path = r"D:\WEB汇总\Acute Aortic Dissection WEB\gbm_model.pkl"
+scaler_path = r"D:\WEB汇总\Acute Aortic Dissection WEB\scaler.pkl"
 
+# 使用joblib加载模型和标准化器
 try:
     with open(model_path, 'rb') as model_file, open(scaler_path, 'rb') as scaler_file:
         model = pickle.load(model_file)
         scaler = pickle.load(scaler_file)
-except FileNotFoundError as e:
-    st.error(f"Model or scaler file not found: {e}")
-    st.stop()
+except Exception as e:
+    st.error(f"Error loading the model or scaler: {e}")
+    raise
 
-# 特征名称和范围
-feature_ranges = {
-    "age": list(range(20, 101)),  # 年龄范围
-    "CREA(μmol/L)": [round(x, 1) for x in range(30, 301)],  # 肌酐范围
-    "HR": list(range(30, 181)),  # 心率范围
-    "hospitalization （d）": list(range(1, 101)),  # 住院天数
-    "HGB (g/L)": [round(x, 1) for x in range(50, 181)]  # 血红蛋白范围
+# 严格匹配训练时的特征名称和顺序（必须与训练数据完全一致）
+original_features = [
+    'CT-lesion involving ascending aorta',  # 必须与训练数据列名完全一致
+    'NEU',
+    'Age',
+    'CT-peritoneal effusion',
+    'AST',
+    'CREA',
+    'Escape beat',  # 注意这里是下划线还是空格
+    'DBP',
+    'CT-intramural hematoma'
+]
+
+# 带单位的显示名称映射（仅用于界面显示）
+display_mapping = {
+    'CT-lesion involving ascending aorta': 'CT: Ascending Aorta Lesion',
+    'NEU': 'Neutrophil (10⁹/L)',
+    'Age': 'Age (years)',
+    'CT-peritoneal effusion': 'CT: Peritoneal Effusion',
+    'AST': 'AST (U/L)',
+    'CREA': 'Creatinine (μmol/L)',
+    'Escape beat': 'ECG: Escape Beat',
+    'DBP': 'Diastolic BP (mmHg)',
+    'CT-intramural hematoma': 'CT: Intramural Hematoma'
 }
 
-normal_ranges = {
-    "CREA(μmol/L)": (60.0, 110.0),  # 肌酐正常值
-    "HR": (60, 100),  # 心率正常值
-    "HGB (g/L)": (120.0, 160.0)  # 血红蛋白正常值
-}
+# ================= 专业医学布局 =================
+st.set_page_config(layout="wide", page_icon="❤️")
 
-# 页面布局：两列
-col1, col2 = st.columns([1, 2])  # 左列1份宽度，右列2份宽度
+# 左侧输入面板
+with st.sidebar:
+    st.markdown("## Patient Parameters")
+    with st.form("input_form"):
+        # 分类特征（保持原始名称）
+        ct_lesion = st.selectbox(display_mapping['CT-lesion involving ascending aorta'], ['No', 'Yes'])
+        ct_effusion = st.selectbox(display_mapping['CT-peritoneal effusion'], ['No', 'Yes'])
+        escape_beat = st.selectbox(display_mapping['Escape beat'], ['No', 'Yes'])
+        ct_hematoma = st.selectbox(display_mapping['CT-intramural hematoma'], ['No', 'Yes'])
+
+        # 连续特征（带单位显示）
+        neu = st.slider(display_mapping['NEU'], 0.0, 30.0, 5.0)
+        age = st.slider(display_mapping['Age'], 18, 100, 60)
+        ast = st.slider(display_mapping['AST'], 0, 500, 30)
+        crea = st.slider(display_mapping['CREA'], 30, 1000, 80)
+        dbp = st.slider(display_mapping['DBP'], 30, 150, 75)
+
+        submitted = st.form_submit_button("Predict Risk")
+
+# 右侧结果面板
+col1, col2 = st.columns([1, 2])
 
 with col1:
-    # 左侧：选择面板
-    st.markdown("<h4 style='margin-bottom:10px;'>Selection Panel</h4>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:14px;'>Picking up parameters</p>", unsafe_allow_html=True)
+    st.markdown("## Aortic Dissection Mortality Predictor")
+    st.markdown(""" 
+    **Multimodal Model Integrating:**
+    - CT Radiomics Features
+    - Electrocardiographic Biomarkers
+    - Clinical Laboratory Data
 
-    # 使用表单
-    with st.form("selection_form"):
-        age = st.selectbox('Age (years)', options=feature_ranges["age"], index=30)
-        crea = st.selectbox('CREA (μmol/L)', options=feature_ranges["CREA(μmol/L)"], index=70)
-        hr = st.selectbox('Heart Rate (HR, bpm)', options=feature_ranges["HR"], index=40)
-        hospitalization_days = st.selectbox('Hospitalization Days', options=feature_ranges["hospitalization （d）"], index=9)
-        hgb = st.selectbox('Hemoglobin (HGB, g/L)', options=feature_ranges["HGB (g/L)"], index=70)
-
-        # 提交按钮
-        submit_button = st.form_submit_button("Predict")
+    **Validation Metrics:**
+    - AUC: 0.89 (0.84-0.94)
+    - Accuracy: 88.05%
+    - F1-score: 0.65
+    - Brier Score: 0.10
+    """)
 
 with col2:
-    # 右侧：调整标题大小
-    st.markdown("<h3 style='margin-bottom:10px;'>3-Year Mortality Prediction for B-Type Aortic Dissection</h3>", unsafe_allow_html=True)
-    st.markdown("<h4 style='margin-bottom:10px;'>Introduction</h4>", unsafe_allow_html=True)
-    st.markdown("<p style='font-size:14px;'>This web-based calculator was developed based on an SVM model with an AUC of 0.82 for predicting 3-year mortality in B-type aortic dissection patients.</p>", unsafe_allow_html=True)
-
-    # 预测结果
-    if submit_button:
-        # 收集输入数据
-        data = {
-            "age": age,
-            "CREA(μmol/L)": crea,
-            "HR": hr,
-            "hospitalization （d）": hospitalization_days,
-            "HGB (g/L)": hgb
-        }
-
+    if submitted:
         try:
-            # 转换为 DataFrame
-            data_df = pd.DataFrame([data], columns=feature_ranges.keys())
+            # 构建与训练数据完全一致的结构
+            input_data = {
+                'CT-lesion involving ascending aorta': 1 if ct_lesion == 'Yes' else 0,
+                'NEU': neu,
+                'Age': age,
+                'CT-peritoneal effusion': 1 if ct_effusion == 'Yes' else 0,
+                'AST': ast,
+                'CREA': crea,
+                'Escape beat': 1 if escape_beat == 'Yes' else 0,
+                'DBP': dbp,
+                'CT-intramural hematoma': 1 if ct_hematoma == 'Yes' else 0
+            }
 
-            # 数据标准化
-            data_scaled = scaler.transform(data_df)
+            # 创建严格排序的DataFrame
+            df = pd.DataFrame([input_data], columns=original_features)
 
-            # 预测
-            prediction = model.predict_proba(data_scaled)[:, 1][0]
+            # 标准化处理
+            scaled_data = scaler.transform(df)
 
-            # 显示预测结果，添加颜色区分
-            if prediction >= 0.284:  # 高风险
-                st.markdown(
-                    f"<span style='color:red; font-size:16px;'>Predicted Mortality Risk: **{prediction * 100:.2f}%** (High risk)</span>",
-                    unsafe_allow_html=True)
-                st.markdown(
-                    "<span style='color:red; font-size:16px;'>High risk of mortality within 3 years.</span>",
-                    unsafe_allow_html=True)
-                st.write("**Recommendations:**")
-            else:  # 低风险
-                st.markdown(
-                    f"<span style='color:green; font-size:16px;'>Predicted Mortality Risk: **{prediction * 100:.2f}%** (Low risk)</span>",
-                    unsafe_allow_html=True)
-                st.markdown(
-                    "<span style='color:green; font-size:16px;'>Low risk of mortality within 3 years.</span>",
-                    unsafe_allow_html=True)
+            # 预测概率
+            prob = model.predict_proba(scaled_data)[0][1]
+            risk_status = "High Risk" if prob >= 0.202 else "Low Risk"
 
-            # 个性化建议
-            for feature, value in data.items():
-                if feature in normal_ranges:
-                    normal_min, normal_max = normal_ranges[feature]
-                    if value < normal_min:
-                        st.markdown(
-                            f"<span style='color:red;'>{feature}: Your value is {value}. It is below the normal range. Consider increasing it.</span>",
-                            unsafe_allow_html=True)
-                    elif value > normal_max:
-                        st.markdown(
-                            f"<span style='color:red;'>{feature}: Your value is {value}. It is above the normal range. Consider decreasing it.</span>",
-                            unsafe_allow_html=True)
-                    else:
-                        st.markdown(
-                            f"<span style='color:green;'>{feature}: Normal.</span>",
-                            unsafe_allow_html=True)
-            if prediction >= 0.284:
-                st.write("**Further Recommendations:**")
-                st.markdown(
-                    "- Regular follow-up with your healthcare provider.\n"
-                    "- Consider additional imaging studies or lab tests as needed.\n"
-                    "- Optimize treatment through medication or surgical intervention."
-                )
+            # 显示结果
+            st.markdown(f"""
+            ### Prediction Result: <span style='color:red'>{risk_status}</span>
+            ##### 1-Year Mortality Probability: {prob * 100:.1f}%
+            """, unsafe_allow_html=True)
+
+            # 医学建议系统
+            st.markdown("### Clinical Decision Support")
+
+            # 实验室异常检测
+            lab_ranges = {
+                'NEU': (2.0, 7.5),
+                'AST': (8, 40),
+                'CREA': (64, 104),
+                'DBP': (60, 80)
+            }
+
+            for param in lab_ranges:
+                value = input_data[param]
+                low, high = lab_ranges[param]
+                if value < low:
+                    st.markdown(f"""
+                    <div style='background-color:#fff3cd; padding:10px; border-radius:5px; margin:10px 0;'>
+                    ⚠️ **{display_mapping[param]}**: {value} (Low)  
+                    Recommended: {{
+                        'NEU': 'Infection screening',
+                        'AST': 'Repeat LFTs',
+                        'CREA': 'Renal ultrasound',
+                        'DBP': 'Volume assessment'
+                    }}[param]
+                    </div>
+                    """, unsafe_allow_html=True)
+                elif value > high:
+                    st.markdown(f"""
+                    <div style='background-color:#f8d7da; padding:10px; border-radius:5px; margin:10px 0;'>
+                    ⚠️ **{display_mapping[param]}**: {value} (High)  
+                    Required: {{
+                        'NEU': 'Sepsis protocol',
+                        'AST': 'Hepatology consult',
+                        'CREA': 'Nephrology consult',
+                        'DBP': 'BP management'
+                    }}[param]
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            # 影像学危急值处理
+            if ct_lesion == 'Yes':
+                st.markdown("""  
+                <div style='background-color:#dc3545; color:white; padding:10px; border-radius:5px; margin:10px 0;'>
+                🚨 **Ascending Aorta Involvement**  
+                Immediate Actions:  
+                1. Call cardiothoracic surgery  
+                2. Prepare OR  
+                3. Monitor for rupture signs  
+                </div>
+                """, unsafe_allow_html=True)
+
+            if ct_hematoma == 'Yes':
+                st.markdown("""  
+                <div style='background-color:#dc3545; color:white; padding:10px; border-radius:5px; margin:10px 0;'>
+                🚨 **Intramural Hematoma**  
+                Priority Measures:  
+                1. Serial CT monitoring  
+                2. Strict BP control (SBP <120 mmHg)  
+                3. Assess organ perfusion  
+                </div>
+                """, unsafe_allow_html=True)
+
         except Exception as e:
-            st.error(f"Error during prediction: {e}")
+            st.error(f"System Error: {str(e)}")
+
+# 临床路径指南
+st.markdown("---")
+st.markdown("""  
+**Clinical Pathway Protocol**  
+1. **High Risk Criteria**:  
+   - Probability ≥20.2%  
+   - Any aortic lesion/hematoma  
+   - Requires ICU admission  
+
+2. **Surgical Indications**:  
+   - Ascending aorta involvement → Emergency surgery  
+   - Rapid hematoma expansion → Endovascular repair  
+
+3. **Laboratory Alert Levels**:  
+   - Creatinine >200 μmol/L → Renal consult  
+   - AST >3×ULN → Hepatic workup  
+
+4. **Monitoring Protocol**:  
+   - Hourly vital signs  
+   - 4-hourly neurovascular checks  
+   - Daily CT for first 72hrs  
+""")
