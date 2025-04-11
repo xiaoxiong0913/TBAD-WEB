@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import pickle
+import joblib
 import warnings
 from sklearn.preprocessing import StandardScaler
 
@@ -13,13 +13,12 @@ scaler_path = r"D:\WEB汇总\Acute Aortic Dissection WEB\scaler.pkl"
 
 # 使用joblib加载模型和标准化器
 try:
-    with open(model_path, 'rb') as model_file, open(scaler_path, 'rb') as scaler_file:
-        model = pickle.load(model_file)
-        scaler = pickle.load(scaler_file)
-        
-        # Check if scaler is an instance of StandardScaler
-        if not isinstance(scaler, StandardScaler):
-            raise ValueError("The loaded scaler is not a StandardScaler instance.")
+    model = joblib.load(model_path)  # 使用joblib加载模型
+    scaler = joblib.load(scaler_path)  # 使用joblib加载标准化器
+
+    # Check if scaler is an instance of StandardScaler
+    if not isinstance(scaler, StandardScaler):
+        raise ValueError("The loaded scaler is not a StandardScaler instance.")
 except Exception as e:
     st.error(f"Error loading the model or scaler: {e}")
     raise
