@@ -16,6 +16,10 @@ try:
     with open(model_path, 'rb') as model_file, open(scaler_path, 'rb') as scaler_file:
         model = pickle.load(model_file)
         scaler = pickle.load(scaler_file)
+        
+        # Check if scaler is an instance of StandardScaler
+        if not isinstance(scaler, StandardScaler):
+            raise ValueError("The loaded scaler is not a StandardScaler instance.")
 except Exception as e:
     st.error(f"Error loading the model or scaler: {e}")
     raise
@@ -106,7 +110,10 @@ with col2:
             df = pd.DataFrame([input_data], columns=original_features)
 
             # 标准化处理
-            scaled_data = scaler.transform(df)
+            if isinstance(scaler, StandardScaler):
+                scaled_data = scaler.transform(df)
+            else:
+                raise ValueError("Scaler is not a valid StandardScaler instance.")
 
             # 预测概率
             prob = model.predict_proba(scaled_data)[0][1]
